@@ -14,11 +14,8 @@ import sys
 import getopt
 import os
 #from netCDF4 import Dataset
-import gdal
-import osr
-import numpy
 
-import utils as utils
+from gfsdownload import utils
 from ecmwfapi import ECMWFDataServer
 
 def main(argv):
