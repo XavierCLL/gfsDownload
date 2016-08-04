@@ -290,7 +290,7 @@ def getShape(pathToImg):
 def GFSDownload(pathToFile,pathToOutputFile):
 
     try:
-        response = urllib.request.urlopen(pathToFile)
+        response = urlopen(pathToFile)
         html = response.read()
     except:
         exit("error while downloading file")
