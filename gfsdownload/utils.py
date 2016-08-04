@@ -250,13 +250,21 @@ def create_request_gfs(dateStart,dateEnd,stepList,levelList,grid,extent,paramLis
                 URL=URL+"{:.2f}".format(grid).replace('.','p')+'.'
                 
                 if typeData=='cycleforecast':
-                    URL=URL+'f006&lev_'
+                    URL=URL+'f006&'
                 elif typeData=='forecast':
-                    URL=URL+'f000&lev_'
+                    URL=URL+'f000&'
                 else:
-                    URL=URL+'anl&lev_'
-                URL=URL+"=on&lev_".join(levelList)+"=on&var_"
-                URL=URL+"=on&var_".join(paramList)+"=on&subregion=&"
+                    URL=URL+'anl&'
+
+                if levelList == ['all'] and paramList == ['all']:
+                    URL = URL + "all_lev" + "=on&all_var" + "=on&subregion=&"
+                elif levelList == ['all'] and not paramList == ['all']:
+                    URL = URL + "all_lev=on&var_" + "=on&var_".join(paramList) + "=on&subregion=&"
+                elif not levelList == ['all'] and paramList == ['all']:
+                    URL=URL+"lev_"+"=on&lev_".join(levelList)+"=on&all_var" + "=on&subregion=&"
+                else:
+                    URL=URL+"lev_"+"=on&lev_".join(levelList)+"=on&var_"
+                    URL=URL+"=on&var_".join(paramList)+"=on&subregion=&"
                 URL=URL+"leftlon="+str(round(float(extent[1])-0.05,1))+"&rightlon="+str(round(float(extent[3])+0.05,1))+"&toplat="+str(round(float(extent[0])+0.5,1))+"&bottomlat="+str(round(float(extent[2])-0.5,1))
                 URL=URL+"&dir=%2Fgfs."+"{:%Y%m%d}".format(dateStart+timedelta(days=i))+str(t).zfill(2)
                 URLlist.append(URL)
