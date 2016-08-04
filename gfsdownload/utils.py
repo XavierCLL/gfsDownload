@@ -16,7 +16,7 @@ import gdal
 import osr
 import numpy as np
 import subprocess
-import urllib.request, urllib.error, urllib.parse
+from urllib.request import urlopen
 import pygrib
 from curses.ascii import isdigit
     
@@ -289,13 +289,12 @@ def getShape(pathToImg):
 
 def GFSDownload(pathToFile,pathToOutputFile):
 
-    response = urllib.request.urlopen(pathToFile)
-    
     try:
+        response = urllib.request.urlopen(pathToFile)
         html = response.read()
     except:
         exit("error while downloading file")
-    
+
     if len(html) > 0:
         f = open(pathToOutputFile, 'wb')
         f.write(html)
