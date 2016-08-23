@@ -44,11 +44,11 @@ A list of code which define parameters desired. Code reference can be found on :
 - eastward wind component UGRD `[m s-1]`
 - northward wind component VGRD `[m s-1]`
 
-### `--init <dateStart YYYY-MM-DD>` and `--end <dateEnd YYYY-MM-DD>`
+#### `--init <dateStart YYYY-MM-DD>` and `--end <dateEnd YYYY-MM-DD>`
  
 Interval period is needed, these parameters should be in a 14 days range from maximum date today 
 
-### `--shapefile <shapefile>` or `-Extend < xmin,ymax,xmax,ymin>` 
+#### `--shapefile <shapefile>` or `-Extend < xmin,ymax,xmax,ymin>` 
 
 Area needed, shapefile (srs is not important because it will be reprojected in WGS84) or extend in WGS84
 
