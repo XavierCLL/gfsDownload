@@ -2,7 +2,7 @@
 # gfsDownload
 
 Tools for downloading gfs meteo parameters modelling estimation on
-an area and on a specific time. GFS is a product of NCEP,NOAA and
+an area and on a specific time. GFS is a product of NCEP, NOAA and
 provide a full range of product which are describe in http://www.nco.ncep.noaa.gov/pmb/products/gfs/
 
 
@@ -25,7 +25,7 @@ python3 GFSDownload.py -help
 gfsDownload has a main function, allow download of parameters on a
 area in an automatic way
 
-### Four paramaters are mandatory:
+### Four parameters are mandatory:
 
 #### `--code <GFSCode>`
 
@@ -35,14 +35,14 @@ A list of code which define parameters desired. Code reference can be found on :
 
 - [For forecast](http://www.nco.ncep.noaa.gov/pmb/products/gfs/gfs_upgrade/gfs.t06z.pgrb2.0p25.f006.shtml)
 
-###### CODE PARAMETERS Exemple:
+###### CODE PARAMETERS Example:
 
-- precipitation : APCP _[m of water]_
-- temperature : TMP
-- pressure : PRES _[Pa]_
-- dewpoint : DPT _[K]_
-- eastward wind component UGRD _[m s-1]_
-- northward wind component VGRD _[m s-1]_
+- precipitation : APCP `[m of water]`
+- temperature : TMP `[K]`
+- pressure : PRES `[Pa]`
+- dewpoint : DPT `[K]`
+- eastward wind component UGRD `[m s-1]`
+- northward wind component VGRD `[m s-1]`
 
 ### `--init <dateStart YYYY-MM-DD>` and `--end <dateEnd YYYY-MM-DD>`
  
@@ -57,11 +57,11 @@ Area needed, shapefile (srs is not important because it will be reprojected in W
 - Pressure and dewPoint on a area during the first month of 2015 on a specific extend: `python3 eraInterimDownload.py -c PRES,DPT -i 2015-01-01 -e 2015-02-01 -E xmin,ymax,xmax,ymin`
  
 
-### Five paramaters are optional:
+### Five parameters are optional:
  
 ####  `--Step <gfsDownload Step> (default 0)` 
 
-The step of modeling. The step of itarate data over the days choosen! default is 0,6,12,18. A list is possible for that parameter:
+The step of modeling. The step of iterate data over the days chosen! default is 0,6,12,18. A list is possible for that parameter:
 `python3 GFSDownload.py -c TMP -i 2013-11-08 -e 2013-12-09 -E
 xmin,ymax,xmax,ymin -p 0,6`
 
@@ -85,7 +85,7 @@ defined to overpass it
 ### Important Notes
 
 All downloaded and processed images are stored by default in your
-home directory in GFS forlder: ~/GFS 
+home directory in GFS folder: ~/GFS 
 
 ### To Do List
 
