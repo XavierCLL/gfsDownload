@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on 25 mars. 2014
 
-Toolbox for downloading era_interim Parameters 
-depending to the code EMCWF a shapefile or an extend for the area, 
-the period needed and an optional outputFile for downloaded raster  
+Toolbox for downloading era_interim Parameters
+depending to the code EMCWF a shapefile or an extend for the area,
+the period needed and an optional outputFile for downloaded raster
 
 @author: yoann Moreau
 @author: benjamin tardy
-'''
+"""
 
 import getopt
 import os
@@ -218,7 +218,7 @@ def main(argv):
 
     utils.convertNETCDFtoTIF(outNETCDFFile, oFolder + '/tmp.tif')
     shape = utils.getShape(outNETCDFFile)
-    if ('pathToShapefile' in locals()):
+    if 'pathToShapefile' in locals():
         utils.reprojRaster(oFolder + '/tmp.tif', outNETCDFFile.rsplit('.')[0] + '.tif', shape, pathToShapefile)
     else:
         utils.reprojRaster(oFolder + '/tmp.tif', outNETCDFFile.rsplit('.')[0] + '.tif', shape)

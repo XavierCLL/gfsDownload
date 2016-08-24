@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on 25 mars. 2014
 
-Toolbox for downloading GFS meteoData 
-depending to the variable GFS needed, a shapefile or an extend for the area, 
-the period needed and an optional outputFile for downloaded raster  
+Toolbox for downloading GFS meteoData
+depending to the variable GFS needed, a shapefile or an extend for the area,
+the period needed and an optional outputFile for downloaded raster
 
 @author: yoann Moreau
-'''
+"""
 
 import getopt
 import os
@@ -111,7 +111,7 @@ def main(argv):
         oFolder
     except NameError:
         oFolder = os.path.expanduser('~')
-        oFolder = oFolder + '/GFS'
+        oFolder += '/GFS'
         print("output folder not precised : downloaded GFF images on " + oFolder)
 
     # verification du folder/or creation if not exists
@@ -180,7 +180,7 @@ def main(argv):
         mode = 'analyse'
 
     # Proxy parameteres needed
-    if (proxy):
+    if proxy:
         login = input('login proxy : ')
         pwd = input('password proxy :  : ')
         site = input('site (surf.cnes.fr) : ')

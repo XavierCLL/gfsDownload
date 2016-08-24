@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on 16 déc. 2013
 
 @author: yoann Moreau
 
 All controls operations :
-return true if control ok 
-'''
+return true if control ok
+"""
+
 import errno
 import os
 import pygrib
@@ -189,7 +190,7 @@ def checkForStepValidity(listStep):
 
 
 def checkForGridValidity(grid):
-    if (is_float_re(grid)):
+    if is_float_re(grid):
         grid = float(grid)
         validParameters = (0.25, 0.5, 1, 2.5)
 
@@ -270,35 +271,35 @@ def create_request_gfs(dateStart, dateEnd, stepList, levelList, grid, extent, pa
             for t in timeListCorr:
                 URL = 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_'
                 # grid
-                URL = URL + "{:.2f}".format(grid).replace('.', 'p') + '.pl?file=gfs.'
+                URL += "{:.2f}".format(grid).replace('.', 'p') + '.pl?file=gfs.'
                 # time ( attention limiter avec décalage horaire for today
-                URL = URL + 't' + str(t).zfill(2) + 'z.'
-                if (grid == 0.5):
-                    URL = URL + 'pgrb2full.'
+                URL += 't' + str(t).zfill(2) + 'z.'
+                if grid == 0.5:
+                    URL += 'pgrb2full.'
                 else:
-                    URL = URL + 'pgrb2.'
-                URL = URL + "{:.2f}".format(grid).replace('.', 'p') + '.'
+                    URL += 'pgrb2.'
+                URL += "{:.2f}".format(grid).replace('.', 'p') + '.'
 
                 if typeData == 'cycleforecast':
-                    URL = URL + 'f006&'
+                    URL += 'f006&'
                 elif typeData == 'forecast':
-                    URL = URL + 'f000&'
+                    URL += 'f000&'
                 else:
-                    URL = URL + 'anl&'
+                    URL += 'anl&'
 
                 if levelList == ['all'] and paramList == ['all']:
-                    URL = URL + "all_lev" + "=on&all_var" + "=on&subregion=&"
+                    URL += "all_lev" + "=on&all_var" + "=on&subregion=&"
                 elif levelList == ['all'] and not paramList == ['all']:
-                    URL = URL + "all_lev=on&var_" + "=on&var_".join(paramList) + "=on&subregion=&"
+                    URL += "all_lev=on&var_" + "=on&var_".join(paramList) + "=on&subregion=&"
                 elif not levelList == ['all'] and paramList == ['all']:
-                    URL = URL + "lev_" + "=on&lev_".join(levelList) + "=on&all_var" + "=on&subregion=&"
+                    URL += "lev_" + "=on&lev_".join(levelList) + "=on&all_var" + "=on&subregion=&"
                 else:
-                    URL = URL + "lev_" + "=on&lev_".join(levelList) + "=on&var_"
-                    URL = URL + "=on&var_".join(paramList) + "=on&subregion=&"
-                URL = URL + "leftlon=" + str(round(float(extent[1]) - 0.05, 1)) + "&rightlon=" + str(
+                    URL += "lev_" + "=on&lev_".join(levelList) + "=on&var_"
+                    URL += "=on&var_".join(paramList) + "=on&subregion=&"
+                URL += "leftlon=" + str(round(float(extent[1]) - 0.05, 1)) + "&rightlon=" + str(
                     round(float(extent[3]) + 0.05, 1)) + "&toplat=" + str(
                     round(float(extent[0]) + 0.5, 1)) + "&bottomlat=" + str(round(float(extent[2]) - 0.5, 1))
-                URL = URL + "&dir=%2Fgfs." + "{:%Y%m%d}".format(dateStart + timedelta(days=i)) + str(t).zfill(2)
+                URL += "&dir=%2Fgfs." + "{:%Y%m%d}".format(dateStart + timedelta(days=i)) + str(t).zfill(2)
                 URLlist.append(URL)
 
         return (URLlist, validChoice, prbParameters)
