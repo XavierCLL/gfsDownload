@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 '''
 Created on 25 mars. 2014
 
@@ -9,21 +9,21 @@ the period needed and an optional outputFile for downloaded raster
 @author: yoann Moreau
 '''
 
-import sys
 import getopt
 import os
-#from netCDF4 import Dataset
+import sys
 
 from gfsdownload import utils
 
-def main(argv):
 
+def main(argv):
     try:
-        opts,argv = getopt.getopt(argv,":h:i:e:s:o:c:E:t:p:g:P:m:l:",['help','[outFile]','code','[shapeFile]','start','end','[tr]'])
+        opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:l:",
+                                   ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]'])
     except getopt.GetoptError:
         print('error in parameter for GFSDownload. type GFSDownload.py -help for more detail on use ')
         sys.exit(2)
-    
+
     for opt, arg in opts:
         if opt == '-h':
             print('GFSDownload.py  ')
@@ -64,30 +64,30 @@ def main(argv):
             print('300_mb')
             print('...')
             print('see http://www.nco.ncep.noaa.gov/pmb/products/gfs/ for product description')
-            sys.exit() 
-        elif opt in ('-o','--outFolder'):
+            sys.exit()
+        elif opt in ('-o', '--outFolder'):
             oFolder = arg
-        elif opt in ('-c','--code'):
+        elif opt in ('-c', '--code'):
             codeGFS = arg.split(',')
-        elif opt in ('-i','--start'):
+        elif opt in ('-i', '--start'):
             startDate = arg
-        elif opt in ('-e','--end'):
+        elif opt in ('-e', '--end'):
             endDate = arg
-        elif opt in ('-s','--shapefile'):
+        elif opt in ('-s', '--shapefile'):
             pathToShapefile = arg
-        elif opt in ('-E','--tr'):
+        elif opt in ('-E', '--tr'):
             extend = arg.split(',')
-        elif opt in ('-g','--grid'):
+        elif opt in ('-g', '--grid'):
             grid = arg
-        elif opt in ('-p','--step'):
+        elif opt in ('-p', '--step'):
             step = arg.split(',')
-        elif opt in ('-P','--proxy'):
+        elif opt in ('-P', '--proxy'):
             proxy = arg
-        elif opt in ('-m','--mode'):
+        elif opt in ('-m', '--mode'):
             mode = arg
-        elif opt in ('-l','--level'):
+        elif opt in ('-l', '--level'):
             levelList = arg.split(',')
-    
+
     if len(sys.argv) < 8:
         print('GFSDownload.py')
         print('    -c <GFSCode> -list possible-')
@@ -106,127 +106,127 @@ def main(argv):
         print('')
         print('For help on paramCode -help')
         sys.exit(2)
-        
+
     try:
         oFolder
     except NameError:
         oFolder = os.path.expanduser('~')
         oFolder = oFolder + '/GFS'
-        print("output folder not precised : downloaded GFF images on "+oFolder)
-    
+        print("output folder not precised : downloaded GFF images on " + oFolder)
+
     # verification du folder/or creation if not exists
-    utils.checkForFolder(oFolder) 
-    
+    utils.checkForFolder(oFolder)
+
     try:
         codeGFS
     except NameError:
-        exit ('parameter(s) needed not precise. Please give the GFS parameter you wish')
+        exit('parameter(s) needed not precise. Please give the GFS parameter you wish')
     utils.checkForParams(codeGFS)
-    
+
     try:
         startDate
     except NameError:
-        exit ('init Date not precised')
+        exit('init Date not precised')
     # verification si sartDate est une date
-    startDate=utils.checkForDate(startDate) 
-    
+    startDate = utils.checkForDate(startDate)
+
     try:
         endDate
     except NameError:
-        exit ('end Date not specified')
+        exit('end Date not specified')
     # verification si sartDate est une date
-    endDate=utils.checkForDate(endDate) 
-    
+    endDate = utils.checkForDate(endDate)
+
     try:
         pathToShapefile
     except NameError:
         try:
             extend
         except NameError:
-            exit ('no Area of interest have been specified. please use -shp or -tr to declare it')
-    
+            exit('no Area of interest have been specified. please use -shp or -tr to declare it')
+
     if 'pathToShapefile' in locals():
-        extendArea=utils.convertShpToExtend(pathToShapefile)
+        extendArea = utils.convertShpToExtend(pathToShapefile)
     else:
-        extendArea=extend
-    extendArea=utils.checkForExtendValidity(extendArea)
-    
+        extendArea = extend
+    extendArea = utils.checkForExtendValidity(extendArea)
+
     try:
         levelList
     except NameError:
-        levelList=['surface']
-    levelList=utils.checkForLevelValidity(levelList)
-    
+        levelList = ['surface']
+    levelList = utils.checkForLevelValidity(levelList)
+
     try:
         grid
     except NameError:
-        grid='0.25'
-    grid=utils.checkForGridValidity(grid)
-        
+        grid = '0.25'
+    grid = utils.checkForGridValidity(grid)
+
     try:
         step
     except NameError:
-        step=[0,6,12,18]
-    step=utils.checkForStepValidity(step)
-        
+        step = [0, 6, 12, 18]
+    step = utils.checkForStepValidity(step)
+
     try:
         proxy
     except NameError:
-        proxy=False
-        
+        proxy = False
+
     try:
         mode
     except NameError:
-        mode='analyse'
-    
-    #Proxy parameteres needed
-    if(proxy):
+        mode = 'analyse'
+
+    # Proxy parameteres needed
+    if (proxy):
         login = input('login proxy : ')
         pwd = input('password proxy :  : ')
         site = input('site (surf.cnes.fr) : ')
-        os.environ["http_proxy"] = "http://%s:%s@%s:8050"%(login,pwd,site)
-        os.environ["https_proxy"] = "http://%s:%s@%s:8050"%(login,pwd,site)
-        
-    
-    #Download GFS
-    struct=utils.create_request_gfs(startDate, endDate, step, levelList, grid, extendArea, codeGFS, mode)    
-    listeFile=[]
-    
-    if len(struct)==0:
+        os.environ["http_proxy"] = "http://%s:%s@%s:8050" % (login, pwd, site)
+        os.environ["https_proxy"] = "http://%s:%s@%s:8050" % (login, pwd, site)
+
+    # Download GFS
+    struct = utils.create_request_gfs(startDate, endDate, step, levelList, grid, extendArea, codeGFS, mode)
+    listeFile = []
+
+    if len(struct) == 0:
         exit("No data founded")
     else:
         for i in struct[0]:
-            try :
-                outpath=oFolder+'/'+",".join(codeGFS)+'_'+i.rsplit('.',1)[1]+'.grb'
+            try:
+                outpath = oFolder + '/' + ",".join(codeGFS) + '_' + i.rsplit('.', 1)[1] + '.grb'
                 listeFile.append(outpath)
-                result=utils.GFSDownload(i,outpath)
+                result = utils.GFSDownload(i, outpath)
             except:
                 print("---")
                 exit('Error in GFS server')
-        
+
         if result:
-            utils.convertGribToTiff(listeFile,codeGFS,levelList,step,grid,startDate,endDate,oFolder)
+            utils.convertGribToTiff(listeFile, codeGFS, levelList, step, grid, startDate, endDate, oFolder)
         else:
             exit("PARAM needed is not compatible with level selected")
-    
+
     if struct[1] is not None:
-        print ("")
-        print ("--------------------------------------------------")
-        print ("")
-        print(("Some parameters couldn't been downloaded in %s mode :" % mode ))
-        print(("They have been downloaded in %s mode due to var %s" % (struct[1],','.join(struct[2])) ))
-    
-    #
-    #utils.convertNETCDFtoTIF(outNETCDFFile, oFolder+'/tmp.tif')
-    #shape=utils.getShape(outNETCDFFile)
-    #if ('pathToShapefile' in locals()):
-    #    utils.reprojRaster(oFolder+'/tmp.tif',outNETCDFFile.rsplit('.')[0]+'.tif',shape,pathToShapefile)
-    #else:
-    #    utils.reprojRaster(oFolder+'/tmp.tif',outNETCDFFile.rsplit('.')[0]+'.tif',shape)
-    #
-    #os.remove(oFolder+'/tmp.tif')
-    #os.remove(outNETCDFFile)
-    
+        print("")
+        print("--------------------------------------------------")
+        print("")
+        print(("Some parameters couldn't been downloaded in %s mode :" % mode))
+        print(("They have been downloaded in %s mode due to var %s" % (struct[1], ','.join(struct[2]))))
+
+        #
+        # utils.convertNETCDFtoTIF(outNETCDFFile, oFolder+'/tmp.tif')
+        # shape=utils.getShape(outNETCDFFile)
+        # if ('pathToShapefile' in locals()):
+        #    utils.reprojRaster(oFolder+'/tmp.tif',outNETCDFFile.rsplit('.')[0]+'.tif',shape,pathToShapefile)
+        # else:
+        #    utils.reprojRaster(oFolder+'/tmp.tif',outNETCDFFile.rsplit('.')[0]+'.tif',shape)
+        #
+        # os.remove(oFolder+'/tmp.tif')
+        # os.remove(outNETCDFFile)
+
+
 if __name__ == '__main__':
     main(sys.argv[1:])
     pass

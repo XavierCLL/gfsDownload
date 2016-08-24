@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 '''
 Created on 25 mars. 2014
 
@@ -10,22 +10,23 @@ the period needed and an optional outputFile for downloaded raster
 @author: benjamin tardy
 '''
 
-import sys
 import getopt
 import os
-#from netCDF4 import Dataset
+import sys
 
-from gfsdownload import utils
 from ecmwfapi import ECMWFDataServer
 
-def main(argv):
+from gfsdownload import utils
 
+
+def main(argv):
     try:
-        opts,argv = getopt.getopt(argv,":h:i:e:s:o:c:E:t:p:g:P:m:",['help','[outFile]','code','[shapeFile]','start','end','[tr]'])
+        opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:",
+                                   ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]'])
     except getopt.GetoptError:
         print('error in parameter for eraInterimDownload. type eraInterimDownload.py -help for more detail on use ')
         sys.exit(2)
-    
+
     for opt, arg in opts:
         if opt == '-h':
             print('eraInterimDownload.py  ')
@@ -59,31 +60,32 @@ def main(argv):
             print('10 metre eastward wind component X X 165 [m s-1]')
             print('10 metre northward wind component X X 166 [m s-1]')
             print('...')
-            print('see http://old.ecmwf.int/publications/library/ecpublications/_pdf/era/era_report_series/RS_1_v2.pdf for more references')
-            sys.exit() 
-        elif opt in ('-o','--outFolder'):
+            print(
+                'see http://old.ecmwf.int/publications/library/ecpublications/_pdf/era/era_report_series/RS_1_v2.pdf for more references')
+            sys.exit()
+        elif opt in ('-o', '--outFolder'):
             oFolder = arg
-        elif opt in ('-c','--code'):
+        elif opt in ('-c', '--code'):
             codeEra = arg.split(',')
-        elif opt in ('-i','--start'):
+        elif opt in ('-i', '--start'):
             startDate = arg
-        elif opt in ('-e','--end'):
+        elif opt in ('-e', '--end'):
             endDate = arg
-        elif opt in ('-s','--shapefile'):
+        elif opt in ('-s', '--shapefile'):
             pathToShapefile = arg
-        elif opt in ('-E','--tr'):
+        elif opt in ('-E', '--tr'):
             extend = arg.split(',')
-        elif opt in ('-t','--time'):
+        elif opt in ('-t', '--time'):
             time = arg.split(',')
-        elif opt in ('-g','--grid'):
+        elif opt in ('-g', '--grid'):
             grid = arg
-        elif opt in ('-p','--step'):
+        elif opt in ('-p', '--step'):
             step = arg.split(',')
-        elif opt in ('-P','--proxy'):
+        elif opt in ('-P', '--proxy'):
             proxy = arg
-        elif opt in ('-m','--mode'):
+        elif opt in ('-m', '--mode'):
             mode = arg
-    
+
     if len(sys.argv) < 8:
         print('eraInterimDownload.py')
         print('    -c <EraInterimCode> -list possible-')
@@ -101,133 +103,130 @@ def main(argv):
         print('')
         print('For help on interimCode -help')
         sys.exit(2)
-        
+
     try:
         oFolder
     except NameError:
         oFolder = os.path.expanduser('~')
         oFolder = oFolder + '/eraInterim'
-        print("output folder not precised : downloaded eraInterim images on "+oFolder)
-    
+        print("output folder not precised : downloaded eraInterim images on " + oFolder)
+
     # verification du folder/or creation if not exists
-    utils.checkForFolder(oFolder) 
-    
+    utils.checkForFolder(oFolder)
+
     try:
         codeEra
     except NameError:
-        exit ('parameters need not precise. Please give the era Interim parameter you wish')
-    
+        exit('parameters need not precise. Please give the era Interim parameter you wish')
+
     try:
         startDate
     except NameError:
-        exit ('init Date not precised')
+        exit('init Date not precised')
     # verification si sartDate est une date
-    startDate=utils.checkForDate(startDate) 
-    
+    startDate = utils.checkForDate(startDate)
+
     try:
         endDate
     except NameError:
-        exit ('end Date not specified')
+        exit('end Date not specified')
     # verification si sartDate est une date
-    endDate=utils.checkForDate(endDate) 
-    
+    endDate = utils.checkForDate(endDate)
+
     try:
         pathToShapefile
     except NameError:
         try:
             extend
         except NameError:
-            exit ('no Area of interest have been specified. please use -shp or -tr to declare it')
-    
-    if 'pathToShapefile' in locals():
-        extendArea=utils.convertShpToExtend(pathToShapefile)
-    else:
-        extendArea=extend
+            exit('no Area of interest have been specified. please use -shp or -tr to declare it')
 
-    extendArea=utils.checkForExtendValidity(extendArea)
-    
+    if 'pathToShapefile' in locals():
+        extendArea = utils.convertShpToExtend(pathToShapefile)
+    else:
+        extendArea = extend
+
+    extendArea = utils.checkForExtendValidity(extendArea)
+
     try:
         time
     except NameError:
-        time=['00','12']
-    time=utils.checkForTimeValidity(time)
-    
+        time = ['00', '12']
+    time = utils.checkForTimeValidity(time)
+
     try:
         grid
     except NameError:
-        grid='0.75'
-    grid=utils.checkForGridValidity(grid)
-        
+        grid = '0.75'
+    grid = utils.checkForGridValidity(grid)
+
     try:
         step
     except NameError:
-        step=[3,6,9,12]
-    step=utils.checkForStepValidity(step)
-    
+        step = [3, 6, 9, 12]
+    step = utils.checkForStepValidity(step)
+
     try:
         proxy
     except NameError:
-        proxy=False
-        
+        proxy = False
+
     try:
         mode
     except NameError:
-        mode='analyse'
-    
-    #Proxy parameteres needed
-    if(proxy):
+        mode = 'analyse'
+
+    # Proxy parameteres needed
+    if (proxy):
         login = input('login proxy : ')
         pwd = input('password proxy :  : ')
         site = input('site (surf.cnes.fr) : ')
-        os.environ["http_proxy"] = "http://%s:%s@%s:8050"%(login,pwd,site)
-        os.environ["https_proxy"] = "http://%s:%s@%s:8050"%(login,pwd,site)
-    
-    
-    #Create param if first Time
-    if (not utils.checkForFile(os.path.expanduser('~')+'/.ecmwfapirc')):
-        print ('for first connexion you have to define yout key and password on ecmwf')
-        print ('cf  https://apps.ecmwf.int/auth/login/')
-        print ('')
+        os.environ["http_proxy"] = "http://%s:%s@%s:8050" % (login, pwd, site)
+        os.environ["https_proxy"] = "http://%s:%s@%s:8050" % (login, pwd, site)
+
+    # Create param if first Time
+    if (not utils.checkForFile(os.path.expanduser('~') + '/.ecmwfapirc')):
+        print('for first connexion you have to define yout key and password on ecmwf')
+        print('cf  https://apps.ecmwf.int/auth/login/')
+        print('')
         u = input('user (mail) : ')
         k = input('keys : ')
-        utils.createParamFile(os.path.expanduser('~')+'/.ecmwfapirc',u,k)
-        
-    
-    #Download NETCDF
+        utils.createParamFile(os.path.expanduser('~') + '/.ecmwfapirc', u, k)
+
+    # Download NETCDF
     server = ECMWFDataServer()
-    outNETCDFFile=oFolder+'/'+"/".join([str(x) for x in codeEra])+'_'+startDate.strftime('%Y%m%d')+'_'+endDate.strftime('%Y%m%d')+'.nc'
-    struct=utils.create_request_sfc(startDate, endDate, time, step, grid, extendArea, codeEra,outNETCDFFile,mode)
-    
-    if len(struct[0])==0:
+    outNETCDFFile = oFolder + '/' + "/".join([str(x) for x in codeEra]) + '_' + startDate.strftime(
+        '%Y%m%d') + '_' + endDate.strftime('%Y%m%d') + '.nc'
+    struct = utils.create_request_sfc(startDate, endDate, time, step, grid, extendArea, codeEra, outNETCDFFile, mode)
+
+    if len(struct[0]) == 0:
         exit()
     else:
         for i in struct[0]:
-            try :
+            try:
                 server.retrieve(i)
             except:
                 print("---")
                 exit('Error in EraInterim server')
-    
 
-    
     if struct[1] is not None:
-        print ("")
-        print ("--------------------------------------------------")
-        print ("")
-        print(("Some parameters couldn't been downloaded in %s mode :" % mode + ' '+ struct[1]  ))
-        print(("They have been downloaded in %s mode" % struct[2] ))
+        print("")
+        print("--------------------------------------------------")
+        print("")
+        print(("Some parameters couldn't been downloaded in %s mode :" % mode + ' ' + struct[1]))
+        print(("They have been downloaded in %s mode" % struct[2]))
 
-    
-    utils.convertNETCDFtoTIF(outNETCDFFile, oFolder+'/tmp.tif')
-    shape=utils.getShape(outNETCDFFile)
+    utils.convertNETCDFtoTIF(outNETCDFFile, oFolder + '/tmp.tif')
+    shape = utils.getShape(outNETCDFFile)
     if ('pathToShapefile' in locals()):
-        utils.reprojRaster(oFolder+'/tmp.tif',outNETCDFFile.rsplit('.')[0]+'.tif',shape,pathToShapefile)
+        utils.reprojRaster(oFolder + '/tmp.tif', outNETCDFFile.rsplit('.')[0] + '.tif', shape, pathToShapefile)
     else:
-        utils.reprojRaster(oFolder+'/tmp.tif',outNETCDFFile.rsplit('.')[0]+'.tif',shape)
-    
-    os.remove(oFolder+'/tmp.tif')
+        utils.reprojRaster(oFolder + '/tmp.tif', outNETCDFFile.rsplit('.')[0] + '.tif', shape)
+
+    os.remove(oFolder + '/tmp.tif')
     os.remove(outNETCDFFile)
-    
+
+
 if __name__ == '__main__':
     main(sys.argv[1:])
     pass
