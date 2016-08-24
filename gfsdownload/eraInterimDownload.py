@@ -8,6 +8,7 @@ the period needed and an optional outputFile for downloaded raster
 
 @author: yoann Moreau
 @author: benjamin tardy
+@author: Xavier Corredor Llano
 """
 
 import getopt

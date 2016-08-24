@@ -3,6 +3,7 @@
 Created on 16 déc. 2013
 
 @author: yoann Moreau
+@author: Xavier Corredor Llano
 
 All controls operations :
 return true if control ok

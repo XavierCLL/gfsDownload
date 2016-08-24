@@ -7,6 +7,7 @@ depending to the variable GFS needed, a shapefile or an extend for the area,
 the period needed and an optional outputFile for downloaded raster
 
 @author: yoann Moreau
+@author: Xavier Corredor Llano
 """
 
 import getopt

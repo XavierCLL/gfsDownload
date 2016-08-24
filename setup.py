@@ -3,8 +3,8 @@
 # eraInterim Util
 #
 #
-# Author: yoann Moreau, Xavier Corredor
-# Contributer: benjamin tadry
+# Author: Yoann Moreau
+# Contributes: Benjamin Tadry, Xavier Corredor Llano
 #
 # License: CC0 1.0 Universal
 
