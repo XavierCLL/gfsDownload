@@ -38,7 +38,7 @@ def main(argv):
             print('        --grid <GFS Grid> (default 0.75)')
             print('        --outfile <outfolder> (default /home/user/GFS)')
             print('        --proxy <proxy : True/False> (default False)')
-            print('        --mode <mode : analyse/forcast/cycleforecast> (default analyse)')
+            print('        --mode <mode : analyse/forecast/cycleforecast> (default analyse)')
             print('')
             print('EXAMPLES')
             print('--temperature on a shapefile')
@@ -122,7 +122,6 @@ def main(argv):
     except NameError:
         exit ('parameter(s) needed not precise. Please give the GFS parameter you wish')
     utils.checkForParams(codeGFS)
-    
     
     try:
         startDate

@@ -190,9 +190,9 @@ def create_request_gfs(dateStart,dateEnd,stepList,levelList,grid,extent,paramLis
     URLlist=[]
     
     #Control datetype
-    listForcastSurface=['GUST','HINDEX','PRES','HGT','TMP','WEASD','SNOD','CPOFP','WILT','FLDCP','SUNSD','LFTX','CAPE','CIN','4LFTX','HPBL','LAND']
+    listforecastSurface=['GUST','HINDEX','PRES','HGT','TMP','WEASD','SNOD','CPOFP','WILT','FLDCP','SUNSD','LFTX','CAPE','CIN','4LFTX','HPBL','LAND']
     if (0 not in [int(x) for x in stepList]):
-        listForcastSurface=listForcastSurface+['PEVPR','CPRAT','PRATE','APCP','ACPCP','WATR','CSNOW','CICEP','CFPER','CRAIN','LHTFL','SHTFL','SHTFL','GFLUX','UFLX','VFLX','U-GWD','V-GWD','DSWRF','DLWRF','ULWRF','USWRF','ALBDO']
+        listforecastSurface=listforecastSurface+['PEVPR','CPRAT','PRATE','APCP','ACPCP','WATR','CSNOW','CICEP','CFPER','CRAIN','LHTFL','SHTFL','SHTFL','GFLUX','UFLX','VFLX','U-GWD','V-GWD','DSWRF','DLWRF','ULWRF','USWRF','ALBDO']
     listAnalyseSurface=['HGT','PRES','LFTX','CAPE','CIN','4LFTX']
     
     if typeData == 'analyse' and all([x in listAnalyseSurface for x in paramList]):
@@ -200,7 +200,7 @@ def create_request_gfs(dateStart,dateEnd,stepList,levelList,grid,extent,paramLis
         validChoice = None
         prbParameters =  None
     else:
-        if all([x in listForcastSurface for x in paramList]) and typeData != 'cycleforecast':
+        if all([x in listforecastSurface for x in paramList]) and typeData != 'cycleforecast':
             if typeData=='analyse':
                 typeData= 'forecast'
                 validChoice = typeData

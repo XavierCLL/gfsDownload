@@ -40,7 +40,7 @@ def main(argv):
             print('        --grid <EraInterim Time> (default 0.75)')
             print('        --outfile <outfolder> (default /home/user/eraInterim)')
             print('        --proxy <proxy : True/False> (default False)')
-            print('        --mode <mode : analyse/forcast> (default analyse)')
+            print('        --mode <mode : analyse/forecast> (default analyse)')
             print('')
             print('EXAMPLES')
             print('--temperature on a shapefile')
