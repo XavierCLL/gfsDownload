@@ -19,9 +19,10 @@ from gfsdownload import utils
 
 
 def main(argv):
+    opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:l:f:",
+                               ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]', '[forecast_hours]'])
     try:
-        opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:l:",
-                                   ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]'])
+        pass
     except getopt.GetoptError:
         print('error in parameter for GFSDownload. type GFSDownload.py -help for more detail on use ')
         sys.exit(2)
@@ -41,6 +42,7 @@ def main(argv):
             print('        --outfile <outfolder> (default /home/user/GFS)')
             print('        --proxy <proxy : True/False> (default False)')
             print('        --mode <mode : analyse/forecast/cycleforecast> (default analyse)')
+            print('        --forecast_hours <set the list of hours forecast start-stop-step> (default False)')
             print('')
             print('EXAMPLES')
             print('--temperature on a shapefile')
@@ -87,6 +89,8 @@ def main(argv):
             proxy = arg
         elif opt in ('-m', '--mode'):
             mode = arg
+        elif opt in ('-f', '--forecast_hours'):
+            forecast_hours = arg
         elif opt in ('-l', '--level'):
             levelList = arg.split(',')
 
@@ -105,6 +109,7 @@ def main(argv):
         print('    [-P <proxy> (default False)]')
         print('    [-l <level> (default 2_m_above_ground)]')
         print('    [-m <mode> (default analyse)]')
+        print('    [-f <forecast_hours start-stop-step> (default False)')
         print('')
         print('For help on paramCode -help')
         sys.exit(2)
@@ -181,6 +186,16 @@ def main(argv):
     except NameError:
         mode = 'analyse'
 
+    try:
+        forecast_hours
+    except NameError:
+        if mode == 'analyse':
+            forecast_hours = 'anl'
+        if mode == 'forecast':
+            forecast_hours = '0-0-1'  # only one file: f000
+        if mode == 'cycleforecast':
+            forecast_hours = '6-6-1'  # only one file: f006
+
     # Proxy parameteres needed
     if proxy:
         login = input('login proxy : ')
@@ -189,8 +204,14 @@ def main(argv):
         os.environ["http_proxy"] = "http://%s:%s@%s:8050" % (login, pwd, site)
         os.environ["https_proxy"] = "http://%s:%s@%s:8050" % (login, pwd, site)
 
+    # check if the forecast_hours set only in forecast mode
+    if mode == 'analyse' and forecast_hours != 'anl':
+        exit('the forecast_hours for analyse mode must be equal to "anl"')
+
     # Download GFS
-    struct = utils.create_request_gfs(startDate, endDate, step, levelList, grid, extendArea, codeGFS, mode)
+    print(startDate, endDate, step, levelList)
+    struct = utils.create_request_gfs(startDate, endDate, step, levelList,
+                                      grid, extendArea, codeGFS, mode, forecast_hours)
     listeFile = []
 
     if len(struct) == 0:
@@ -198,7 +219,9 @@ def main(argv):
     else:
         for i in struct[0]:
             try:
-                outpath = oFolder + '/' + ",".join(codeGFS) + '_' + i.rsplit('.', 1)[1] + '.grb'
+                print(i)
+                outpath = oFolder + '/' + ",".join(codeGFS) + '_' + i.rsplit('.', 1)[1] + \
+                          '_' + i.split('&')[0].split('.')[-1] + '.grb'
                 listeFile.append(outpath)
                 result = utils.GFSDownload(i, outpath)
             except:

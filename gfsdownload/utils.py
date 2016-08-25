@@ -205,7 +205,14 @@ def checkForGridValidity(grid):
         exit('grid parameters not conform to eraInterim posibility : ' + ",".join([str(x) for x in validParameters]))
 
 
-def create_request_gfs(dateStart, dateEnd, stepList, levelList, grid, extent, paramList, typeData):
+def fix_zeros(value, digits):
+    if digits == 2:
+        return '0'+str(value) if len(str(value))<2 else str(value)
+    if digits == 3:
+        return '00'+str(value) if len(str(value))==1 else ('0'+str(value) if len(str(value))==2 else str(value))
+
+
+def create_request_gfs(dateStart, dateEnd, stepList, levelList, grid, extent, paramList, typeData, forecast_hours):
     """
         Genere la structure de requete pour le téléchargement de données GFS
         
@@ -266,43 +273,50 @@ def create_request_gfs(dateStart, dateEnd, stepList, levelList, grid, extent, pa
             # on crontrole pour les timeList
             if dateStart + timedelta(days=i) == today:
                 maxT = datetime.now().hour - 5
-                timeListCorr = [x for x in stepList if x < maxT]
+                timeList = [x for x in stepList if x < maxT]
             else:
-                timeListCorr = stepList
+                timeList = stepList
 
-            for t in timeListCorr:
-                URL = 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_'
-                # grid
-                URL += "{:.2f}".format(grid).replace('.', 'p') + '.pl?file=gfs.'
-                # time ( attention limiter avec décalage horaire for today
-                URL += 't' + str(t).zfill(2) + 'z.'
-                if grid == 0.5:
-                    URL += 'pgrb2full.'
+            for t in timeList:
+                if forecast_hours == 'anl':
+                    hoursList = ['anl']
                 else:
-                    URL += 'pgrb2.'
-                URL += "{:.2f}".format(grid).replace('.', 'p') + '.'
+                    start = int(forecast_hours.split('-')[0])
+                    stop = int(forecast_hours.split('-')[1])
+                    step = int(forecast_hours.split('-')[2])
+                    hoursList = range(start, stop+1, step)
 
-                if typeData == 'cycleforecast':
-                    URL += 'f006&'
-                elif typeData == 'forecast':
-                    URL += 'f000&'
-                else:
-                    URL += 'anl&'
+                for h in hoursList:
+                    URL = 'http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_'
+                    # grid
+                    URL += "{:.2f}".format(grid).replace('.', 'p') + '.pl?file=gfs.'
+                    # time ( attention limiter avec décalage horaire for today
+                    URL += 't' + str(t).zfill(2) + 'z.'
+                    if grid == 0.5:
+                        URL += 'pgrb2full.'
+                    else:
+                        URL += 'pgrb2.'
+                    URL += "{:.2f}".format(grid).replace('.', 'p') + '.'
 
-                if levelList == ['all'] and paramList == ['all']:
-                    URL += "all_lev" + "=on&all_var" + "=on&subregion=&"
-                elif levelList == ['all'] and not paramList == ['all']:
-                    URL += "all_lev=on&var_" + "=on&var_".join(paramList) + "=on&subregion=&"
-                elif not levelList == ['all'] and paramList == ['all']:
-                    URL += "lev_" + "=on&lev_".join(levelList) + "=on&all_var" + "=on&subregion=&"
-                else:
-                    URL += "lev_" + "=on&lev_".join(levelList) + "=on&var_"
-                    URL += "=on&var_".join(paramList) + "=on&subregion=&"
-                URL += "leftlon=" + str(round(float(extent[1]) - 0.05, 1)) + "&rightlon=" + str(
-                    round(float(extent[3]) + 0.05, 1)) + "&toplat=" + str(
-                    round(float(extent[0]) + 0.5, 1)) + "&bottomlat=" + str(round(float(extent[2]) - 0.5, 1))
-                URL += "&dir=%2Fgfs." + "{:%Y%m%d}".format(dateStart + timedelta(days=i)) + str(t).zfill(2)
-                URLlist.append(URL)
+                    if h == 'anl':
+                        URL += h + '&'
+                    else:
+                        URL += 'f' + fix_zeros(h, 3) + '&'
+
+                    if levelList == ['all'] and paramList == ['all']:
+                        URL += "all_lev" + "=on&all_var" + "=on&subregion=&"
+                    elif levelList == ['all'] and not paramList == ['all']:
+                        URL += "all_lev=on&var_" + "=on&var_".join(paramList) + "=on&subregion=&"
+                    elif not levelList == ['all'] and paramList == ['all']:
+                        URL += "lev_" + "=on&lev_".join(levelList) + "=on&all_var" + "=on&subregion=&"
+                    else:
+                        URL += "lev_" + "=on&lev_".join(levelList) + "=on&var_"
+                        URL += "=on&var_".join(paramList) + "=on&subregion=&"
+                    URL += "leftlon=" + str(round(float(extent[1]) - 0.05, 1)) + "&rightlon=" + str(
+                        round(float(extent[3]) + 0.05, 1)) + "&toplat=" + str(
+                        round(float(extent[0]) + 0.5, 1)) + "&bottomlat=" + str(round(float(extent[2]) - 0.5, 1))
+                    URL += "&dir=%2Fgfs." + "{:%Y%m%d}".format(dateStart + timedelta(days=i)) + str(t).zfill(2)
+                    URLlist.append(URL)
 
         return (URLlist, validChoice, prbParameters)
 
