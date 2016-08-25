@@ -209,7 +209,6 @@ def main(argv):
         exit('the forecast_hours for analyse mode must be equal to "anl"')
 
     # Download GFS
-    print(startDate, endDate, step, levelList)
     struct = utils.create_request_gfs(startDate, endDate, step, levelList,
                                       grid, extendArea, codeGFS, mode, forecast_hours)
     listeFile = []
@@ -219,11 +218,13 @@ def main(argv):
     else:
         for i in struct[0]:
             try:
-                print(i)
-                outpath = oFolder + '/' + ",".join(codeGFS) + '_' + i.rsplit('.', 1)[1] + \
+                namefile = ",".join(codeGFS) + '_' + i.rsplit('.', 1)[1] + \
                           '_' + i.split('&')[0].split('.')[-1] + '.grb'
+                outpath = oFolder + '/' + namefile
+                print("Downloading: " + namefile + ' ', end='', flush=True)
                 listeFile.append(outpath)
                 result = utils.GFSDownload(i, outpath)
+                print('OK')
             except:
                 print("---")
                 exit('Error in GFS server')
