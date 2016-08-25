@@ -119,7 +119,7 @@ def main(argv):
     except NameError:
         oFolder = os.path.expanduser('~')
         oFolder += '/GFS'
-        print("output folder not precised : downloaded GFF images on " + oFolder)
+        print("output folder not precised : downloaded GFS images on " + oFolder)
 
     # verification du folder/or creation if not exists
     utils.checkForFolder(oFolder)
