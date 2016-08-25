@@ -226,13 +226,13 @@ def main(argv):
                 result = utils.GFSDownload(i, outpath)
                 print('OK')
             except:
-                print("---")
+                print('FAIL')
                 exit('Error in GFS server')
 
-        if result:
-            utils.convertGribToTiff(listeFile, codeGFS, levelList, step, grid, startDate, endDate, oFolder)
-        else:
-            exit("PARAM needed is not compatible with level selected")
+        #if result:
+        #    utils.convertGribToTiff(listeFile, codeGFS, levelList, step, grid, startDate, endDate, oFolder)
+        #else:
+        #    exit("PARAM needed is not compatible with level selected")
 
     if struct[1] is not None:
         print("")
