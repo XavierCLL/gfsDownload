@@ -19,10 +19,9 @@ from gfsdownload import utils
 
 
 def main(argv):
-    opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:l:f:",
-                               ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]', '[forecast_hours]'])
     try:
-        pass
+        opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:l:f:",
+                                   ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]', '[forecast_hours]'])
     except getopt.GetoptError:
         print('error in parameter for GFSDownload. type GFSDownload.py -help for more detail on use ')
         sys.exit(2)
