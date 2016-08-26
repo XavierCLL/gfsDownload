@@ -234,7 +234,7 @@ def main(argv):
         #else:
         #    exit("PARAM needed is not compatible with level selected")
 
-    if struct[1] is not None:
+    if struct[1] is None:
         print("")
         print("--------------------------------------------------")
         print("")
