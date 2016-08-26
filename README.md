@@ -82,6 +82,12 @@ Sometimes a proxy definition is needed for downloading from external
 network. When this option is activated, a proxy user/key/site could be
 defined to overpass it 
 
+#### `--forecast_hours <start-stop-step> (default False)`
+
+This is for set the list of hours forecast in format `<start-stop-step>` for download the forecast files in a range o hours, example download for each time the forecast hourly 0, 3, 6, 9:
+
+`python3 GFSDownload.py -c all -i 2011-10-01 -e 2011-10-02 -E xmin,ymax,xmax,ymin -g 0.5 -f 0-9-3`
+
 ### Important Notes
 
 All downloaded and processed images are stored by default in your
