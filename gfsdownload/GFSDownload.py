@@ -4,7 +4,7 @@
 Created on 25 mars. 2014
 
 Toolbox for downloading GFS meteoData
-depending to the variable GFS needed, a shapefile or an extend for the area,
+depending to the variable GFS needed, an extend for the area,
 the period needed and an optional outputFile for downloaded raster
 
 @author: yoann Moreau
@@ -20,8 +20,8 @@ from gfsdownload import utils
 
 def main(argv):
     try:
-        opts, argv = getopt.getopt(argv, ":h:i:e:s:o:c:E:t:p:g:P:m:l:f:",
-                                   ['help', '[outFile]', 'code', '[shapeFile]', 'start', 'end', '[tr]', '[forecast_hours]'])
+        opts, argv = getopt.getopt(argv, ":h:i:e:o:c:E:t:p:g:P:m:l:f:",
+                                   ['help', '[outFile]', 'code', 'start', 'end', '[tr]', '[forecast_hours]'])
     except getopt.GetoptError:
         print('error in parameter for GFSDownload. type GFSDownload.py -help for more detail on use ')
         sys.exit(2)
@@ -33,7 +33,7 @@ def main(argv):
             print('        --code <GFSCode>')
             print('        --init <dateStart YYYY-MM-DD>')
             print('        --end <dateEnd YYYY-MM-DD>')
-            print('        --shapefile <shapefile> OU -Extend < xmin,ymax,xmax,ymin>')
+            print('        --extend < xmin,ymax,xmax,ymin>')
             print('    [optional] :')
             print('        --level <GFS Level> (default surface)')
             print('        --step <GFS Step> (default 3,6,9,12)')
@@ -76,8 +76,6 @@ def main(argv):
             startDate = arg
         elif opt in ('-e', '--end'):
             endDate = arg
-        elif opt in ('-s', '--shapefile'):
-            pathToShapefile = arg
         elif opt in ('-E', '--tr'):
             extend = arg.split(',')
         elif opt in ('-g', '--grid'):
@@ -98,7 +96,6 @@ def main(argv):
         print('    -c <GFSCode> -list possible-')
         print('    -i <dateStart YYYY-MM-DD> ')
         print('    -e <dateEnd YY-MM-DD>')
-        print('    -s <shapefile> ')
         print('  or')
         print('    -E < xmin,ymax,xmax,ymin>]')
         print('')
@@ -144,17 +141,11 @@ def main(argv):
     endDate = utils.checkForDate(endDate)
 
     try:
-        pathToShapefile
+        extend
     except NameError:
-        try:
-            extend
-        except NameError:
-            exit('no Area of interest have been specified. please use -shp or -tr to declare it')
+        exit('no Area of interest have been specified. please use -shp or -tr to declare it')
 
-    if 'pathToShapefile' in locals():
-        extendArea = utils.convertShpToExtend(pathToShapefile)
-    else:
-        extendArea = extend
+    extendArea = extend
     extendArea = utils.checkForExtendValidity(extendArea)
 
     try:

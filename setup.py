@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-
-# eraInterim Util
-#
 #
 # Author: Yoann Moreau
 # Contributes: Benjamin Tadry, Xavier Corredor Llano
@@ -23,16 +20,12 @@ setup(
     long_description=readme(),
     author="Yoann M, Xavier Corredor",
     author_email="yoann.moreau@gmail.com, xavier.corredor.llano@gmail.com",
-    scripts=["gfsdownload/GFSDownload.py", "gfsdownload/eraInterimDownload.py"],
+    scripts=["gfsdownload/GFSDownload.py"],
     url="https://github.com/XavierCLL/gfsDownload",
     packages=find_packages(),
     license="CCO",
     platforms="Posix; ",
-    install_requires=[
-        "GDAL",
-        "OGR",
-        "ecmwfapi"
-    ],
+    install_requires=[],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",

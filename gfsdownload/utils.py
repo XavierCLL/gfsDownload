@@ -12,16 +12,9 @@ return true if control ok
 
 import errno
 import os
-import pygrib
 import re
-import subprocess
 from datetime import date, datetime, timedelta
 from urllib.request import urlopen
-
-import gdal
-import numpy as np
-import ogr
-import osr
 
 
 def checkForFile(pathToFile):
@@ -76,43 +69,6 @@ def checkForDate(dateC):
             exit('Error on Date Format... please give a date in YYYY-MM-DD format')
     else:
         exit('Error on Date Format... please give a date in YYYY-MM-DD format')
-
-
-def convertShpToExtend(pathToShp):
-    """
-    reprojette en WGS84 et recupere l'extend
-    """
-
-    driver = ogr.GetDriverByName('ESRI Shapefile')
-    dataset = driver.Open(pathToShp)
-    if dataset is not None:
-        # from Layer
-        layer = dataset.GetLayer()
-        spatialRef = layer.GetSpatialRef()
-        # from Geometry
-        feature = layer.GetNextFeature()
-        geom = feature.GetGeometryRef()
-        spatialRef = geom.GetSpatialReference()
-
-        # WGS84
-        outSpatialRef = osr.SpatialReference()
-        outSpatialRef.ImportFromEPSG(4326)
-
-        coordTrans = osr.CoordinateTransformation(spatialRef, outSpatialRef)
-
-        env = geom.GetEnvelope()
-
-        pointMAX = ogr.Geometry(ogr.wkbPoint)
-        pointMAX.AddPoint(env[1], env[3])
-        pointMAX.Transform(coordTrans)
-
-        pointMIN = ogr.Geometry(ogr.wkbPoint)
-        pointMIN.AddPoint(env[0], env[2])
-        pointMIN.Transform(coordTrans)
-
-        return [pointMAX.GetPoint()[1], pointMIN.GetPoint()[0], pointMIN.GetPoint()[1], pointMAX.GetPoint()[0]]
-    else:
-        exit(" shapefile not found. Please verify your path to the shapefile")
 
 
 def is_float_re(element):
@@ -192,17 +148,17 @@ def checkForStepValidity(listStep):
 
 
 def checkForGridValidity(grid):
+    validParameters = (0.25, 0.5, 1, 2.5)
     if is_float_re(grid):
         grid = float(grid)
-        validParameters = (0.25, 0.5, 1, 2.5)
 
         if grid in validParameters:
             return grid
         else:
             exit(
-                'grid parameters not conform to eraInterim posibility : ' + ",".join([str(x) for x in validParameters]))
+                'grid parameters not conform to posibility : ' + ",".join([str(x) for x in validParameters]))
     else:
-        exit('grid parameters not conform to eraInterim posibility : ' + ",".join([str(x) for x in validParameters]))
+        exit('grid parameters not conform to posibility : ' + ",".join([str(x) for x in validParameters]))
 
 
 def fix_zeros(value, digits):
@@ -321,32 +277,6 @@ def create_request_gfs(dateStart, dateEnd, stepList, levelList, grid, extent, pa
         return (URLlist, validChoice, prbParameters)
 
 
-def reprojRaster(pathToImg, output, shape, pathToShape=None):
-    driver = ogr.GetDriverByName('ESRI Shapefile')
-    if pathToShape is not None:
-        dataSource = driver.Open(pathToShape, 0)
-        layer = dataSource.GetLayer()
-        srs = layer.GetSpatialRef()
-        proj = srs.ExportToWkt()
-    else:
-        proj = 'EPSG:4326'
-
-    Xres = shape[0]
-    Yres = shape[1]
-    subprocess.call(
-        ["gdalwarp", "-q", "-t_srs", proj, pathToImg, output, '-ts', str(Xres), str(Yres), '-overwrite', '-dstnodata',
-         "0"])
-    return output
-
-
-def getShape(pathToImg):
-    raster = gdal.Open(pathToImg)
-    cols = raster.RasterXSize
-    rows = raster.RasterYSize
-
-    return (cols, rows)
-
-
 def GFSDownload(pathToFile, pathToOutputFile):
     try:
         response = urlopen(pathToFile)
@@ -360,72 +290,3 @@ def GFSDownload(pathToFile, pathToOutputFile):
         return True
     else:
         return False
-
-
-def writeTiffFromDicoArray(DicoArray, outputImg, shape, geoparam, proj=None, format=gdal.GDT_Float32):
-    gdalFormat = 'GTiff'
-    driver = gdal.GetDriverByName(gdalFormat)
-
-    dst_ds = driver.Create(outputImg, shape[1], shape[0], len(DicoArray), format)
-
-    j = 1
-    for i in list(DicoArray.values()):
-        dst_ds.GetRasterBand(j).WriteArray(i, 0)
-        band = dst_ds.GetRasterBand(j)
-        band.SetNoDataValue(0)
-        j += 1
-
-    originX = geoparam[0]
-    originY = geoparam[1]
-    pixelWidth = geoparam[2]
-    pixelHeight = geoparam[3]
-
-    dst_ds.SetGeoTransform((originX, pixelWidth, 0, originY, 0, pixelHeight))
-    if proj == None:
-        spatialRef = osr.SpatialReference()
-        spatialRef.ImportFromEPSG(4326)
-        dst_ds.SetProjection(spatialRef.ExportToWkt())
-
-
-def convertGribToTiff(listeFile, listParam, listLevel, liststep, grid, startDate, endDate, outFolder):
-    """ Convert GRIB to Tif"""
-
-    dicoValues = {}
-
-    for l in listeFile:
-        grbs = pygrib.open(l)
-        grbs.seek(0)
-        index = 1
-        for j in range(len(listLevel), 0, -1):
-            for i in range(len(listParam) - 1, -1, -1):
-                grb = grbs[index]
-                p = grb.name.replace(' ', '_')
-                if grb.level != 0:
-                    l = str(grb.level) + '_' + grb.typeOfLevel
-                else:
-                    l = grb.typeOfLevel
-                if p + '_' + l not in list(dicoValues.keys()):
-                    dicoValues[p + '_' + l] = []
-                dicoValues[p + '_' + l].append(grb.values)
-                shape = grb.values.shape
-                lat, lon = grb.latlons()
-                geoparam = (lon.min(), lat.max(), grid, grid)
-                index += 1
-
-    nbJour = (endDate - startDate).days + 1
-    # on joute des arrayNan si il manque des fichiers
-    for s in range(0, (len(liststep) * nbJour - len(listeFile))):
-        for k in list(dicoValues.keys()):
-            dicoValues[k].append(np.full(shape, np.nan))
-
-    # On écrit pour chacune des variables dans un fichier
-    for i in range(len(list(dicoValues.keys())) - 1, -1, -1):
-        dictParam = dict((k, dicoValues[list(dicoValues.keys())[i]][k]) for k in
-                         range(0, len(dicoValues[list(dicoValues.keys())[i]])))
-        sorted(list(dictParam.items()), key=lambda x: x[0])
-        outputImg = outFolder + '/' + list(dicoValues.keys())[i] + '_' + startDate.strftime(
-            '%Y%M%d') + '_' + endDate.strftime('%Y%M%d') + '.tif'
-        writeTiffFromDicoArray(dictParam, outputImg, shape, geoparam)
-
-    for f in listeFile:
-        os.remove(f)
