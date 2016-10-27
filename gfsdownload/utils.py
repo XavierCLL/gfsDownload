@@ -218,17 +218,17 @@ def create_request_gfs(dateStart, dateEnd, stepList, levelList, grid, extent, pa
                 prbParameters.append(paramList[i - 1])
 
     # Control si date/timeList disponible
-    today = date.today()
-    lastData = today - timedelta(days=14)
-    if dateStart < lastData or dateEnd > today:
-        exit('date are not in 14 days range from today')
+    UTC_today = datetime.utcnow()
+    lastData = UTC_today - timedelta(days=14)
+    if dateStart < lastData.date() or dateEnd > UTC_today.date():
+        exit('date are not in 14 days range from UTC today')
     else:
         # Pour chaque jour souhaité
         nbDays = (dateEnd - dateStart).days + 1
         for i in range(0, nbDays):
             # on crontrole pour les timeList
-            if dateStart + timedelta(days=i) == today:
-                maxT = datetime.now().hour - 5
+            if dateStart + timedelta(days=i) == UTC_today:
+                maxT = datetime.utcnow().hour + 4
                 timeList = [x for x in stepList if x < maxT]
             else:
                 timeList = stepList
